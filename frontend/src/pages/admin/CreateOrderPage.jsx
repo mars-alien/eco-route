@@ -7,10 +7,8 @@ import { useCreateOrder } from '../../hooks/useOrders'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
+import { TILE_URL, ATTRIBUTION } from '../../api/mapConfig'
 import '../../styles/map.css'
-
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-const ATTRIBUTION = '&copy; OpenStreetMap contributors &copy; CARTO'
 
 const pinIcon = divIcon({
   className: '',
@@ -113,7 +111,7 @@ export default function CreateOrderPage() {
             </div>
 
             {createOrder.isError && (
-              <p style={{ color: '#e06060', fontSize: 'var(--text-sm)' }}>
+              <p style={{ color: 'var(--danger)', fontSize: 'var(--text-sm)' }}>
                 {createOrder.error?.response?.data?.message || 'Failed to create order'}
               </p>
             )}

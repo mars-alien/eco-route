@@ -6,20 +6,18 @@ import { useDriverAssignment, useCompleteStop } from '../../hooks/useRoutes'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 import EmptyState from '../../components/ui/EmptyState'
+import { TILE_URL, ATTRIBUTION } from '../../api/mapConfig'
 import '../../styles/map.css'
 
-const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-const ATTRIBUTION = '&copy; OpenStreetMap contributors &copy; CARTO'
-
 function stopIcon(seq, completed) {
-  const bg = completed ? '#3b8c78' : '#3b8c78'
-  const border = completed ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.8)'
+  const bg = completed ? '#2F9E6E' : '#FF9F1C'
+  const border = completed ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.9)'
   return divIcon({
     className: '',
     html: `<div class="cluster-marker" style="background:${bg};border-color:${border}">${completed ? '✓' : seq}</div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -14],
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15],
   })
 }
 
@@ -32,7 +30,7 @@ export default function DriverRoutePage() {
   const currentIdx = plan?.stops.indexOf(currentStop)
 
   return (
-    <ProtectedRoute role="driver" title="Route Map" mapLayout>
+    <ProtectedRoute role="driver" title="My Route" mapLayout>
       <div style={{ position: 'relative', height: '100%' }}>
         {isLoading && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -50,10 +48,10 @@ export default function DriverRoutePage() {
               <TileLayer url={TILE_URL} attribution={ATTRIBUTION} />
               <Polyline
                 positions={plan.stops.map((s) => [s.lat, s.lng])}
-                color="var(--accent)"
-                weight={3}
-                opacity={0.8}
-                dashArray="8 5"
+                color="#FF9F1C"
+                weight={3.5}
+                opacity={0.85}
+                dashArray="10 6"
               />
               {plan.stops.map((stop, idx) => (
                 <Marker
@@ -62,9 +60,9 @@ export default function DriverRoutePage() {
                   icon={stopIcon(stop.sequence, stop.status === 'COMPLETED')}
                 >
                   <Popup>
-                    <strong>Stop #{stop.sequence}</strong><br />
-                    {stop.address}<br />
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
+                    <strong style={{ color: 'var(--text-primary)' }}>Stop #{stop.sequence}</strong><br />
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>{stop.address}</span><br />
+                    <span style={{ color: 'var(--accent)', fontSize: '11px', fontWeight: 600 }}>
                       ETA {stop.eta_minutes} min
                     </span>
                   </Popup>
@@ -72,57 +70,92 @@ export default function DriverRoutePage() {
               ))}
             </MapContainer>
 
+            {/* Bottom sheet — current stop */}
             {currentStop && (
               <div style={{
                 position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '260px',
+                bottom: 0, left: 0, right: 0,
                 background: 'var(--surface)',
-                borderTop: '1px solid var(--border)',
-                padding: 'var(--s4)',
+                borderTop: '2px solid var(--border)',
+                borderRadius: '20px 20px 0 0',
+                padding: '20px 24px',
                 zIndex: 1000,
+                boxShadow: '0 -8px 32px rgba(180,130,20,0.14)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--s3)',
+                gap: '12px',
               }}>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                {/* Handle */}
+                <div style={{
+                  width: '40px', height: '4px', borderRadius: '2px',
+                  background: 'var(--border)', margin: '-8px auto 4px',
+                }} />
+
+                <div style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: 'var(--text-muted)',
+                }}>
                   Current Stop — {currentIdx + 1} of {plan.stops.length}
                 </div>
+
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 'var(--text-md)' }}>Stop #{currentStop.sequence}</div>
-                  <div style={{ color: 'var(--text-secondary)', marginTop: 'var(--s1)' }}>{currentStop.address}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-sm)', color: 'var(--accent)', marginTop: 'var(--s2)' }}>
-                    ETA {currentStop.eta_minutes} min
+                  <div style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 700, fontSize: '18px',
+                    color: 'var(--text-primary)',
+                  }}>
+                    Stop #{currentStop.sequence}
+                  </div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '4px' }}>
+                    {currentStop.address}
+                  </div>
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    marginTop: '8px',
+                    padding: '4px 12px',
+                    background: 'var(--accent-dim)',
+                    borderRadius: '50px',
+                    fontSize: '12px', fontWeight: 700,
+                    color: '#8A5605',
+                  }}>
+                    ⏱ ETA {currentStop.eta_minutes} min
                   </div>
                 </div>
+
                 <Button
                   variant="primary"
-                  style={{ justifyContent: 'center', marginTop: 'auto' }}
+                  style={{ justifyContent: 'center', padding: '13px', fontSize: '15px' }}
                   disabled={completeStop.isPending}
                   onClick={() => completeStop.mutate({ planId: plan.plan_id, stopIndex: currentIdx })}
                 >
-                  {completeStop.isPending ? <Spinner size={16} /> : 'Mark as Delivered'}
+                  {completeStop.isPending ? <Spinner size={16} /> : '✓ Mark as Delivered'}
                 </Button>
               </div>
             )}
 
+            {/* All done banner */}
             {!currentStop && (
               <div style={{
                 position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: 'var(--s6)',
+                bottom: 0, left: 0, right: 0,
+                padding: '24px',
                 background: 'var(--surface)',
-                borderTop: '1px solid var(--border)',
+                borderTop: '2px solid var(--border)',
+                borderRadius: '20px 20px 0 0',
                 textAlign: 'center',
-                color: 'var(--delivered)',
-                fontWeight: 600,
                 zIndex: 1000,
+                boxShadow: '0 -8px 32px rgba(180,130,20,0.14)',
               }}>
-                All stops completed!
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎉</div>
+                <div style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '20px', fontWeight: 700,
+                  color: 'var(--success)',
+                }}>All stops completed!</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  Great work — your route is complete.
+                </div>
               </div>
             )}
           </>

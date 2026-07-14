@@ -1,6 +1,7 @@
 import math
 from datetime import datetime, timezone
 from bson import ObjectId
+from fastapi import HTTPException
 from database import get_db
 from .algorithms.kmeans import KMeansClusterer, Point
 from .algorithms.tsp import NearestNeighborTSP, Stop
@@ -159,7 +160,6 @@ async def get_all_plans() -> list:
     return [_plan_to_response(d) for d in docs]
 
 async def get_plan(plan_id: str) -> dict:
-    from fastapi import HTTPException
     db = get_db()
     doc = await db.route_plans.find_one({"_id": ObjectId(plan_id)})
     if not doc:

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { optimizeRoutes, getRoutePlans, getRoutePlan } from '../api/routing'
-import { getDriverAssignment, completeStop, getAllAssignments } from '../api/assignments'
+import { optimizeRoutes, getRoutePlans } from '../api/routing'
+import { getDriverAssignment, completeStop } from '../api/assignments'
 
 export function useOptimize() {
   const qc = useQueryClient()
@@ -16,10 +16,6 @@ export function useOptimize() {
 
 export function useRoutePlans() {
   return useQuery({ queryKey: ['plans'], queryFn: getRoutePlans })
-}
-
-export function useRoutePlan(id) {
-  return useQuery({ queryKey: ['plans', id], queryFn: () => getRoutePlan(id), enabled: !!id })
 }
 
 export function useDriverAssignment(driverId) {
@@ -40,8 +36,4 @@ export function useCompleteStop() {
       qc.invalidateQueries({ queryKey: ['orders'] })
     },
   })
-}
-
-export function useAllAssignments() {
-  return useQuery({ queryKey: ['assignments'], queryFn: getAllAssignments })
 }

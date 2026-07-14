@@ -1,170 +1,206 @@
-# 🌿 EcoRoute — Intelligent Delivery Route Optimizer
+<div align="center">
 
-> A full-stack delivery management system that clusters orders geographically and computes optimal driver routes using **K-Means++** and **Nearest Neighbor TSP**, implemented from scratch in pure Python.
+# 🌿 EcoRoute
 
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat&logo=fastapi&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=flat&logo=mongodb&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat&logo=vite&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)
+### Intelligent Delivery Route Optimizer
 
----
+*Cluster orders geographically. Compute optimal driver routes. Reduce fuel and emissions.*
 
-## Table of Contents
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [ML Algorithms](#ml-algorithms)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Screenshots](#screenshots)
-- [Design Decisions](#design-decisions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-F2790B?style=for-the-badge)](LICENSE)
+![Status](https://img.shields.io/badge/Status-Active-2F9E6E?style=for-the-badge)
+
+</div>
 
 ---
 
-## Overview
+## What is EcoRoute?
 
-EcoRoute solves a real-world **last-mile delivery problem**: given a set of pending orders scattered across a city and a fleet of available drivers, how do you assign orders to drivers and sequence each driver's stops to minimize total travel distance?
+EcoRoute is a full-stack delivery management platform that solves the **last-mile delivery problem**: given scattered orders across a city and a fleet of drivers, how do you assign and sequence stops to minimize total travel distance?
 
-The system uses a two-stage optimization:
+It answers that with two algorithms built from scratch in pure Python:
 
-1. **K-Means++ Clustering** — groups geographically close orders into clusters, one per driver
-2. **Nearest Neighbor TSP Heuristic** — finds an efficient visit sequence within each cluster
+| Stage | Algorithm | What it does |
+|:---:|---|---|
+| 1️⃣ | **K-Means++ Clustering** | Groups geographically close orders — one cluster per driver |
+| 2️⃣ | **Nearest Neighbor TSP** | Finds an efficient visit sequence within each cluster |
 
-Both algorithms are implemented from scratch in pure Python with no ML library dependencies, making every line explainable in a technical interview.
+No ML library wrappers. Every line of the optimization engine is explainable.
+
+---
+
+## Screenshots
+
+> 📸 *Add your screenshots below by replacing the placeholder paths.*
+
+### 🔐 Login
+*Two-column layout — warm gradient hero panel left, sign-in card right.*
+
+<!-- Replace with your screenshot -->
+![Login Page](screenshots/login.png)
+
+---
+
+### 📊 Admin Dashboard
+*Four gradient stat tiles + recent orders list + available drivers with live status dots.*
+
+<!-- Replace with your screenshot -->
+![Admin Dashboard](screenshots/admin-dashboard.png)
+
+---
+
+### 📦 Orders Management
+*Scrollable filter tabs, status pills, and inline delete for pending orders.*
+
+<!-- Replace with your screenshot -->
+![Orders Page](screenshots/orders.png)
+
+---
+
+### 🗺 Route Optimizer
+*Split panel — controls + route cards left, live Leaflet map right. Color-coded clusters per driver.*
+
+<!-- Replace with your screenshot -->
+![Route Optimizer](screenshots/optimizer.png)
+
+---
+
+### 🚗 Driver Dashboard
+*Today's route summary + sequenced stop cards with Mark Delivered action.*
+
+<!-- Replace with your screenshot -->
+![Driver Dashboard](screenshots/driver-dashboard.png)
+
+---
+
+### 📍 Driver Route Map
+*Full-screen map with numbered pins, amber route polyline, and bottom-sheet current-stop panel.*
+
+<!-- Replace with your screenshot -->
+![Driver Route](screenshots/driver-route.png)
+
+---
+
+## How It Works
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                        React Frontend                         │
+│    React Query · Zustand · React Hook Form · Leaflet.js      │
+└──────────────────────────┬───────────────────────────────────┘
+                           │  HTTP + JWT Bearer token
+┌──────────────────────────▼───────────────────────────────────┐
+│                 FastAPI  (Modular Monolith)                   │
+│                                                               │
+│   /auth      /orders     /drivers                            │
+│   /routing              /assignments                         │
+│                                                               │
+│   ┌───────────────────────────────────────────────────────┐  │
+│   │          Optimization Pipeline  (Pure Python)          │  │
+│   │                                                        │  │
+│   │   pending orders                                       │  │
+│   │        │                                               │  │
+│   │        ▼                                               │  │
+│   │   geo.py ──► kmeans.py ──► tsp.py ──► eta.py          │  │
+│   │   Haversine    K-Means++   NN-TSP    Linear ETA        │  │
+│   │                                                        │  │
+│   │   Zero FastAPI / Motor imports — pure computation      │  │
+│   └───────────────────────────────────────────────────────┘  │
+└──────────────────────────┬───────────────────────────────────┘
+                           │  Motor (async driver)
+┌──────────────────────────▼───────────────────────────────────┐
+│                    MongoDB 7  (Docker)                        │
+│     orders · drivers · users · route_plans                   │
+│     2dsphere indexes on orders.location + drivers.location   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Optimization pipeline step-by-step
+
+```
+1. Fetch all PENDING orders + AVAILABLE drivers from MongoDB
+
+2. K-Means++ initialization
+   ├── Pick first centroid uniformly at random
+   └── Each next centroid sampled ∝ D(x)² (spreads centroids)
+
+3. Iterate until convergence (max shift < 0.0001 km)
+   ├── Assign each order to nearest centroid (Haversine)
+   └── Recompute centroid = mean(lat), mean(lng) of cluster
+
+4. For each cluster → Nearest Neighbor TSP
+   ├── Start at driver GPS location (depot)
+   ├── Greedily pick nearest unvisited stop
+   └── Repeat → O(n²), ~20% above optimal
+
+5. Compute cumulative ETA per stop
+   └── ETA = 5.0 + 2.0×km + 3.0×stops  (linear model)
+
+6. Bulk-write route_plans, mark orders ASSIGNED
+```
 
 ---
 
 ## Features
 
-### Admin
-- Create and manage delivery orders with live map coordinate preview
-- View all orders with filter tabs (Pending / Assigned / In Transit / Delivered)
-- Run one-click route optimization across all pending orders and available drivers
-- Visualize cluster assignments and driver routes on an interactive dark-theme Leaflet map
-- See per-driver route plans with distance, ETA, and ordered stop list
+<details>
+<summary><strong>👤 Admin</strong></summary>
 
-### Driver
-- View assigned delivery route with sequenced stops and cumulative ETAs
-- Interactive map with polyline route and numbered markers
-- Mark individual stops as delivered from both list and map views
-- Route auto-completes when all stops are marked done
+- Create delivery orders with live map coordinate preview
+- View all orders with filter tabs (All / Pending / Assigned / In Transit / Delivered)
+- One-click **Run Optimization** across all pending orders and available drivers
+- Interactive Leaflet map — color-coded cluster markers + dashed driver route polylines
+- Per-driver route plan cards — distance, ETA, ordered stop list
+- Delete pending orders
 
-### System
+</details>
+
+<details>
+<summary><strong>🚗 Driver</strong></summary>
+
+- View assigned route with sequenced stops and cumulative ETAs
+- Full-screen map with numbered markers and amber route polyline
+- Mark individual stops as delivered from list view or map bottom sheet
+- Route auto-completes when all stops are done
+
+</details>
+
+<details>
+<summary><strong>⚙️ System</strong></summary>
+
 - JWT authentication with role-based access control (admin / driver)
-- GeoJSON 2dsphere indexes for efficient geospatial queries
-- Async FastAPI with Motor for non-blocking MongoDB operations
-- React Query for server state — no manual `useEffect` data fetching
-- Zustand for minimal global auth state with localStorage persistence
+- GeoJSON `2dsphere` indexes for efficient geospatial queries
+- Async FastAPI + Motor — no blocking DB calls on the event loop
+- React Query v5 — automatic caching, background refetch, zero `useEffect` data fetching
+- Zustand for minimal global auth state with `localStorage` persistence
+- Fully responsive — mobile sidebar becomes a slide-in drawer
+
+</details>
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Why |
+| Layer | Technology | Reason |
 |---|---|---|
-| Backend | Python 3.11 + FastAPI | Async, fast, automatic OpenAPI docs |
-| Database | MongoDB 7 + GeoJSON | Native geospatial queries, flexible document schema |
-| Async Driver | Motor 3 | Non-blocking MongoDB for asyncio — matches FastAPI's event loop |
-| Auth | JWT (python-jose) + bcrypt | Stateless authentication, industry standard |
-| ML / Optimization | Pure Python | Every line is explainable; no black-box library calls |
-| Frontend | React 18 + Vite | Fast HMR, modern JSX tooling |
-| Map | Leaflet.js + React-Leaflet | Open-source, no API key required |
-| Server State | TanStack React Query v5 | Automatic caching, background refetch, loading states |
-| Global State | Zustand | Minimal boilerplate for auth token/role |
-| HTTP Client | Axios | Interceptors for JWT injection and 401 handling |
-| Forms | React Hook Form | Uncontrolled inputs, performant validation |
-| Container | Docker Compose | One-command MongoDB setup |
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    React Frontend                        │
-│  React Query · Zustand · React Hook Form · Leaflet.js   │
-└──────────────────────┬──────────────────────────────────┘
-                       │ HTTP + JWT
-┌──────────────────────▼──────────────────────────────────┐
-│               FastAPI (Modular Monolith)                 │
-│                                                          │
-│  /api/auth  /api/orders  /api/drivers                    │
-│  /api/routing            /api/assignments                │
-│                                                          │
-│  ┌─────────────────────────────────────────────────┐    │
-│  │          Optimization Engine (Pure Python)       │    │
-│  │  geo.py → kmeans.py → tsp.py → eta.py           │    │
-│  │  Zero FastAPI/Motor imports — computation only   │    │
-│  └─────────────────────────────────────────────────┘    │
-└──────────────────────┬──────────────────────────────────┘
-                       │ Motor (async)
-┌──────────────────────▼──────────────────────────────────┐
-│                 MongoDB 7 (Docker)                       │
-│  orders · drivers · users · route_plans                  │
-│  2dsphere indexes on orders.location, drivers.location   │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Modular Monolith** — FastAPI `APIRouter` gives clean module separation (auth, orders, drivers, routing, assignments) without the overhead of microservices. At this scale — a handful of drivers, hundreds of orders — separate deployable services add network hops and distributed transaction complexity with no benefit.
-
----
-
-## ML Algorithms
-
-### K-Means++ (`routing/algorithms/kmeans.py`)
-
-Standard K-Means with smarter initialization:
-
-**Why K-Means++?** Naive K-Means picks initial centroids randomly, which can lead to slow convergence or poor clusters. K-Means++ picks each subsequent centroid with probability proportional to `D(x)²` — the squared distance from the nearest already-chosen centroid. This spreads centroids out and reliably produces better clusters.
-
-```
-1. Pick first centroid uniformly at random from orders
-2. For each remaining centroid:
-   - Compute D(x)² for every point to its nearest chosen centroid
-   - Sample next centroid with probability ∝ D(x)²
-3. Iterate:
-   - Assign each order to nearest centroid (Haversine distance)
-   - Recompute centroids as mean lat/lng of assigned points
-   - Stop when max centroid shift < 0.0001 km or max_iter reached
-```
-
-**Distance metric:** Haversine formula (great-circle distance on a sphere), not Euclidean. One degree of longitude covers ~111 km at the equator but shrinks near the poles — Euclidean distance on raw coordinates is geometrically wrong for geographic data.
-
-### Nearest Neighbor TSP (`routing/algorithms/tsp.py`)
-
-Classic greedy heuristic for the Travelling Salesman Problem:
-
-```
-1. Start at driver's current GPS location (the depot)
-2. Find the nearest unvisited stop (Haversine)
-3. Move there, add to route, mark visited
-4. Repeat until all stops visited
-```
-
-- **Complexity:** O(n²) per cluster — negligible for ≤20 stops per driver
-- **Quality:** ~20% above optimal on random instances (acceptable for MVP)
-- **Production path:** Google OR-Tools CVRPTW with time windows and vehicle capacity constraints
-
-### ETA Predictor (`routing/algorithms/eta.py`)
-
-Linear model fitted to typical city delivery conditions:
-
-```
-ETA (minutes) = 5.0 + 2.0 × distance_km + 3.0 × num_stops
-```
-
-| Coefficient | Value | Meaning |
-|---|---|---|
-| b0 (base) | 5.0 min | App startup, first movement overhead |
-| b1 (speed) | 2.0 min/km | 30 km/h average city speed |
-| b2 (stop) | 3.0 min/stop | Unloading + customer confirmation |
-
-**Production path:** Train on historical delivery logs with features `time_of_day`, `day_of_week`, `vehicle_type` using `sklearn.LinearRegression`.
+| **Backend** | Python 3.11 + FastAPI | Async, fast, automatic OpenAPI/Swagger docs |
+| **Database** | MongoDB 7 + GeoJSON | Native geospatial queries, flexible document schema |
+| **Async Driver** | Motor 3 | Non-blocking MongoDB matching FastAPI's asyncio loop |
+| **Auth** | JWT (python-jose) + bcrypt | Stateless, industry-standard, no session store |
+| **ML / Optimization** | Pure Python | Every line is explainable — no black-box library calls |
+| **Frontend** | React 18 + Vite | Fast HMR, modern JSX tooling |
+| **Map** | Leaflet.js + React-Leaflet | Open-source, no API key required |
+| **Server State** | TanStack React Query v5 | Caching, loading states, cache invalidation |
+| **Global State** | Zustand | Minimal boilerplate for auth token/role |
+| **HTTP Client** | Axios | Interceptors for JWT injection + 401 auto-redirect |
+| **Forms** | React Hook Form | Uncontrolled inputs, performant validation |
+| **Container** | Docker Compose | One-command MongoDB setup |
 
 ---
 
@@ -178,25 +214,25 @@ ecoroute/
 │   ├── main.py                  # FastAPI app, CORS, router registration
 │   ├── config.py                # Pydantic settings (reads .env)
 │   ├── database.py              # Motor client, 2dsphere index creation
-│   ├── seed.py                  # Creates admin, 3 drivers, 15 Bengaluru orders
+│   ├── seed.py                  # Creates admin + 3 drivers + 15 Bengaluru orders
 │   ├── requirements.txt
-│   ├── .env
+│   ├── .env                     # Dev defaults — change JWT_SECRET before prod
 │   │
-│   ├── auth/                    # JWT login, register, /me
-│   ├── orders/                  # CRUD + status state machine
+│   ├── auth/                    # JWT login, register, /me, dependencies
+│   ├── orders/                  # CRUD + PENDING→ASSIGNED→IN_TRANSIT→DELIVERED FSM
 │   ├── drivers/                 # List, available filter, location update
 │   │
 │   ├── routing/
-│   │   ├── router.py            # POST /optimize, GET /plans
-│   │   ├── service.py           # Orchestration pipeline
+│   │   ├── router.py            # POST /optimize  ·  GET /plans
+│   │   ├── service.py           # Full optimization orchestration
 │   │   ├── schemas.py
-│   │   └── algorithms/          # Pure Python — zero app imports
-│   │       ├── geo.py           # Haversine formula
+│   │   └── algorithms/          # ← Pure Python, zero app imports
+│   │       ├── geo.py           # Haversine great-circle distance
 │   │       ├── kmeans.py        # K-Means++ from scratch
 │   │       ├── tsp.py           # Nearest Neighbor heuristic
 │   │       └── eta.py           # Linear ETA model
 │   │
-│   └── assignments/             # Driver route fetch, stop completion
+│   └── assignments/             # Driver route fetch + stop completion
 │
 └── frontend/
     ├── index.html
@@ -205,21 +241,29 @@ ecoroute/
     └── src/
         ├── main.jsx             # QueryClient, BrowserRouter, root render
         ├── App.jsx              # Route definitions
-        ├── api/                 # axios.js + one file per module
-        ├── hooks/               # React Query hooks (useOrders, useRoutes…)
-        ├── store/               # Zustand authStore (persisted)
+        │
+        ├── api/
+        │   ├── axios.js         # JWT interceptor + 401 auto-logout
+        │   ├── mapConfig.js     # Shared tile URL + attribution
+        │   └── *.js             # One file per backend module
+        │
+        ├── hooks/               # React Query wrappers (useOrders, useRoutes…)
+        ├── store/               # Zustand authStore (persisted to localStorage)
+        │
         ├── components/
-        │   ├── layout/          # Sidebar, Topbar, ProtectedRoute
+        │   ├── layout/          # Sidebar (collapse + mobile drawer), Topbar, ProtectedRoute
         │   ├── map/             # DeliveryMap (display-only), ClusterMarkers, RoutePolyline
-        │   ├── orders/          # OrderTable, OrderCard, StatusBadge
-        │   └── ui/              # Button, Input, Select, Spinner, EmptyState
+        │   ├── orders/          # OrderTable, StatusBadge
+        │   └── ui/              # Button, Input, Spinner, EmptyState
+        │
         ├── pages/
-        │   ├── LoginPage.jsx
+        │   ├── LoginPage.jsx    # Sign In / Sign Up tabs, hero panel, quick-fill chips
         │   ├── admin/           # Dashboard, Orders, CreateOrder, RouteOptimizer
-        │   └── driver/          # Dashboard, RoutePage
+        │   └── driver/          # Dashboard (stop list), RoutePage (map + bottom sheet)
+        │
         └── styles/
-            ├── globals.css      # Design tokens (CSS variables), global resets
-            └── map.css          # Leaflet dark theme overrides
+            ├── globals.css      # Design tokens (CSS vars), component classes, animations
+            └── map.css          # Leaflet light-theme overrides
 ```
 
 ---
@@ -228,52 +272,52 @@ ecoroute/
 
 ### Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for MongoDB)
-- Python 3.11+
-- Node.js 18+
+| Requirement | Version |
+|---|---|
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Any recent |
+| Python | 3.11 or 3.12 *(not 3.13+)* |
+| Node.js | 18+ |
 
-### 1. Clone the repository
+> ⚠️ **Python version note:** Dependencies are validated on 3.11/3.12. Python 3.13+ may fail to build native wheels (`pydantic-core`) on Windows without the full Visual C++ build tools.
+
+---
+
+### 1 · Clone
 
 ```bash
 git clone https://github.com/your-username/ecoroute.git
 cd ecoroute
 ```
 
-### 2. Start MongoDB
+### 2 · Start MongoDB
 
 ```bash
 docker compose up -d
 ```
 
-### 3. Set up the backend
+MongoDB will now **auto-start every time Docker Desktop opens** (the service has `restart: unless-stopped`).
+
+### 3 · Backend
 
 ```bash
 cd backend
+
+# Create and activate virtual environment
+py -3.11 -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
+
+# Install dependencies
 pip install -r requirements.txt
-```
 
-> **Note — Python 3.14 users:** `passlib[bcrypt]` is incompatible with bcrypt 5.0+. This project uses `bcrypt` directly instead of passlib — no action needed, it's already handled in the code.
-
-Copy the environment file (defaults work out of the box):
-
-```bash
-# .env is already present with development defaults
-# Edit JWT_SECRET before any production deployment
-```
-
-Seed the database with demo data:
-
-```bash
+# Seed demo data (1 admin + 3 drivers + 15 orders)
 python seed.py
-```
 
-Start the API server:
-
-```bash
+# Start the API server
 python -m uvicorn main:app --reload --port 8000
 ```
 
-### 4. Set up the frontend
+### 4 · Frontend
 
 ```bash
 cd ../frontend
@@ -281,122 +325,214 @@ npm install
 npm run dev
 ```
 
-### 5. Open the app
+### 5 · Open
 
-| URL | Description |
+| URL | What |
 |---|---|
-| http://localhost:5173 | React frontend |
-| http://localhost:8000/docs | FastAPI Swagger UI |
-| http://localhost:8000/redoc | FastAPI ReDoc |
+| **http://localhost:5173** | React app |
+| **http://localhost:8000/docs** | Swagger UI (interactive API explorer) |
+| **http://localhost:8000/redoc** | ReDoc API docs |
 
-### Demo credentials
+---
+
+## Demo Credentials
 
 | Role | Email | Password |
-|---|---|---|
-| Admin | admin@ecoroute.com | admin123 |
-| Driver 1 | driver1@ecoroute.com | driver123 |
-| Driver 2 | driver2@ecoroute.com | driver123 |
-| Driver 3 | driver3@ecoroute.com | driver123 |
+|:---:|---|---|
+| 👑 Admin | `admin@ecoroute.com` | `admin123` |
+| 🚗 Driver 1 | `driver1@ecoroute.com` | `driver123` |
+| 🚗 Driver 2 | `driver2@ecoroute.com` | `driver123` |
+| 🚗 Driver 3 | `driver3@ecoroute.com` | `driver123` |
 
-### Quick demo flow
+### Quick demo walkthrough
 
-1. Log in as **admin** → Dashboard shows 15 pending orders, 3 available drivers
-2. Go to **Optimizer** → Click **Run Optimization**
-3. Watch the map: orders cluster by geography, dashed polylines show each driver's route
-4. Log in as **driver1** → See assigned stops with ETAs
-5. Click **Mark as Delivered** on each stop → status updates propagate in real time
+```
+1. Log in as admin
+   └── Dashboard: 15 pending orders, 3 available drivers
+
+2. Go to Optimizer → click "Run Optimization"
+   └── Map: orders recolor into 3 geographic clusters
+       Route cards appear with distance + ETA per driver
+
+3. Log in as driver1
+   └── My Deliveries: sequenced stops with ETAs
+
+4. Click "Mark delivered" on each stop
+   └── Badge turns green ✓
+       When all done — route marked COMPLETED
+```
 
 ---
 
 ## API Reference
 
-### Auth
+<details>
+<summary><strong>🔐 Auth</strong></summary>
+
+| Method | Endpoint | Auth | Body / Response |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | None | `{email, password}` → `{token, role, user_id, name}` |
+| `POST` | `/api/auth/register` | None | `{name, email, password}` → creates driver account |
+| `GET` | `/api/auth/me` | Any | Returns current user from token |
+
+</details>
+
+<details>
+<summary><strong>📦 Orders</strong></summary>
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| POST | `/api/auth/login` | None | `{ email, password }` → `{ token, role, user_id, name }` |
-| POST | `/api/auth/register` | None | Create admin or driver account |
-| GET | `/api/auth/me` | Any | Returns current user from token |
+| `GET` | `/api/orders` | Any | Admin: all orders · Driver: their assigned orders |
+| `POST` | `/api/orders` | Admin | Create order with lat/lng coordinates |
+| `GET` | `/api/orders/{id}` | Any | Single order |
+| `PATCH` | `/api/orders/{id}/status` | Driver | Advance status (`IN_TRANSIT` → `DELIVERED`) |
+| `DELETE` | `/api/orders/{id}` | Admin | Delete — PENDING orders only |
 
-### Orders
+</details>
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/orders` | Any | Admin: all orders. Driver: their assigned orders |
-| POST | `/api/orders` | Admin | Create order with lat/lng coordinates |
-| GET | `/api/orders/{id}` | Any | Single order |
-| PATCH | `/api/orders/{id}/status` | Driver | Advance status (`IN_TRANSIT`, `DELIVERED`) |
-| DELETE | `/api/orders/{id}` | Admin | Delete — PENDING orders only |
-
-### Drivers
+<details>
+<summary><strong>🚗 Drivers</strong></summary>
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/api/drivers` | Admin | All drivers |
-| GET | `/api/drivers/available` | Admin | Drivers with `is_available: true` |
-| PATCH | `/api/drivers/{id}/location` | Driver | Update GPS position |
+| `GET` | `/api/drivers` | Admin | All drivers |
+| `GET` | `/api/drivers/available` | Admin | Drivers with `is_available: true` |
+| `PATCH` | `/api/drivers/{id}/location` | Driver | Update GPS position |
 
-### Routing
+</details>
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/routing/optimize` | Admin | Run K-Means++ + TSP optimization |
-| GET | `/api/routing/plans` | Admin | All route plans |
-| GET | `/api/routing/plans/{id}` | Any | Single route plan with stops |
-
-### Assignments
+<details>
+<summary><strong>🗺 Routing</strong></summary>
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/api/assignments/driver/{id}` | Any | Active route plan for a driver |
-| PATCH | `/api/assignments/{plan_id}/stops/{index}/complete` | Driver | Mark stop delivered |
-| GET | `/api/assignments/all` | Admin | All active plans summary |
+| `POST` | `/api/routing/optimize` | Admin | Run K-Means++ + TSP — assigns all PENDING orders |
+| `GET` | `/api/routing/plans` | Admin | All route plans |
+| `GET` | `/api/routing/plans/{id}` | Any | Single plan with stop list |
+
+</details>
+
+<details>
+<summary><strong>📋 Assignments</strong></summary>
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/assignments/driver/{id}` | Any | Active route plan for a driver |
+| `PATCH` | `/api/assignments/{plan_id}/stops/{idx}/complete` | Driver | Mark stop delivered |
+| `GET` | `/api/assignments/all` | Admin | All active plans summary |
+
+</details>
 
 ---
 
-## Screenshots
+## ML Algorithms
 
-### Login
-Clean dark-theme login with role hints for demo use.
+<details>
+<summary><strong>📐 Haversine Distance  <code>geo.py</code></strong></summary>
 
-### Admin Dashboard
-4 stat cards (total orders, pending, available drivers, route plans) + recent activity tables.
+```
+distance = 2R · atan2(√a, √(1−a))
+  where a = sin²(Δlat/2) + cos(lat1)·cos(lat2)·sin²(Δlng/2)
+```
 
-### Orders Page
-Filterable table with status badges (Pending / Assigned / In Transit / Delivered) and inline delete for pending orders.
+**Why Haversine, not Euclidean?**
+One degree of longitude covers ~111 km at the equator but shrinks toward the poles. Raw `(lat, lng)` coordinates are not a flat Cartesian plane — Euclidean distance is geometrically wrong for geographic clustering.
 
-### Route Optimizer
-Split-panel view: left panel shows order/driver counts and route plan cards; right panel is a full-height Leaflet map with color-coded cluster markers and dashed driver route polylines.
+</details>
 
-### Driver Route Page
-Full-screen map with sequenced numbered markers and a bottom sheet showing the current stop with a "Mark as Delivered" button.
+<details>
+<summary><strong>🔵 K-Means++ Clustering  <code>kmeans.py</code></strong></summary>
+
+Standard K-Means with smarter initialization that reliably avoids poor convergence:
+
+```
+Initialization (K-Means++ over naive random):
+  1. Pick first centroid uniformly at random from orders
+  2. For each remaining centroid k:
+     - Compute D(x)² = squared Haversine to nearest chosen centroid
+     - Sample next centroid with probability ∝ D(x)²
+     → This spreads centroids, guaranteeing better starting positions
+
+Iteration:
+  1. Assign each order to its nearest centroid (Haversine)
+  2. Recompute centroid = mean(lat), mean(lng) of assigned points
+  3. Stop when max centroid shift < 0.0001 km  OR  max_iter reached
+```
+
+</details>
+
+<details>
+<summary><strong>🛣 Nearest Neighbor TSP  <code>tsp.py</code></strong></summary>
+
+Classic greedy heuristic — fast and good enough for small clusters:
+
+```
+1. Start at driver's current GPS position (the depot)
+2. Find the nearest unvisited stop (Haversine)
+3. Travel there, mark visited, update current position
+4. Repeat until all stops visited
+```
+
+| Property | Value |
+|---|---|
+| Time complexity | O(n²) per cluster |
+| Solution quality | ~20% above optimal on random instances |
+| Max stops per driver | 8 (configurable) |
+| Production upgrade | Google OR-Tools CVRPTW with time windows |
+
+</details>
+
+<details>
+<summary><strong>⏱ Linear ETA Model  <code>eta.py</code></strong></summary>
+
+```
+ETA (minutes) = 5.0 + 2.0 × distance_km + 3.0 × num_stops
+```
+
+| Coefficient | Value | Meaning |
+|---|---|---|
+| b₀ (base) | 5.0 min | App startup, first-movement overhead |
+| b₁ (speed) | 2.0 min/km | 30 km/h average city speed |
+| b₂ (stop) | 3.0 min/stop | Unloading + customer confirmation time |
+
+**Production path:** train on historical delivery logs with features `time_of_day`, `day_of_week`, `vehicle_type` using `sklearn.LinearRegression`.
+
+</details>
 
 ---
 
 ## Design Decisions
 
-### Why a Modular Monolith, not Microservices?
+<details>
+<summary><strong>Why a Modular Monolith and not Microservices?</strong></summary>
 
-FastAPI `APIRouter` provides clean module boundaries (auth, orders, drivers, routing, assignments) without separate deployable services. At this scale — a handful of drivers, hundreds of orders — microservices add network hops, distributed transaction complexity, and deployment overhead with zero benefit. The package structure makes future service extraction straightforward if scale demands it.
+FastAPI `APIRouter` gives clean module separation (auth, orders, drivers, routing, assignments) without separate deployable services. At this scale — a handful of drivers, hundreds of orders — microservices add network hops, distributed transaction complexity, and deployment overhead for zero benefit. The package structure makes future service extraction straightforward if scale demands it.
 
-### Why MongoDB over PostgreSQL + PostGIS?
+</details>
 
-MongoDB has **native GeoJSON support** with `2dsphere` indexes. A proximity query is a single `$nearSphere` without PostGIS extension management. Route plan documents naturally embed their stops array — no join required to fetch a driver's full route. Schema flexibility means evolving the order document without migration files.
+<details>
+<summary><strong>Why MongoDB over PostgreSQL + PostGIS?</strong></summary>
 
-### Why implement algorithms from scratch?
+MongoDB has **native GeoJSON** support with `2dsphere` indexes — a proximity query is a single `$nearSphere` with no extension management. Route plan documents naturally embed their stops array, so fetching a driver's full route needs no join. Schema flexibility allows evolving order fields without migration files.
 
-- `sklearn.KMeans` + `OR-Tools` would solve the problem, but you can't explain what they do in an interview
-- The K-Means++ implementation is ~60 lines; the TSP heuristic is ~25 lines
-- Every coefficient, every distance formula, every convergence condition is visible and explainable
-- The `routing/algorithms/` folder has **zero imports from FastAPI or Motor** — pure computation, fully unit-testable in isolation
+</details>
 
-### Why `Motor` over `PyMongo`?
+<details>
+<summary><strong>Why implement the algorithms from scratch?</strong></summary>
 
-FastAPI is built on asyncio. Motor is the official async MongoDB driver — same API as PyMongo but never blocks the event loop. This matters for `POST /routing/optimize` which performs multiple DB reads before returning.
+- `sklearn.KMeans` + `OR-Tools` would solve the problem, but you can't explain what they do in a technical interview
+- The K-Means++ implementation is ~80 lines; the TSP heuristic is ~30 lines
+- Every coefficient, distance formula, and convergence condition is visible and changeable
+- `routing/algorithms/` has **zero imports from FastAPI or Motor** — pure computation, fully unit-testable in isolation
 
-### Why React Query over `useEffect` + `useState`?
+</details>
 
-React Query handles loading states, error states, background refetching, cache invalidation, and deduplication automatically. Using `useEffect` for data fetching means manually reimplementing all of that, plus risk of race conditions and stale closure bugs.
+<details>
+<summary><strong>Why React Query over useEffect + useState?</strong></summary>
+
+React Query handles loading states, error states, background refetching, cache invalidation, and deduplication automatically. `useEffect` for data fetching means manually reimplementing all of that — plus risk of race conditions and stale closure bugs on every component.
+
+</details>
 
 ---
 
@@ -406,28 +542,37 @@ React Query handles loading states, error states, background refetching, cache i
 # backend/.env
 MONGO_URL=mongodb://localhost:27017
 DB_NAME=ecoroute
-JWT_SECRET=change-this-in-production    # Use a long random string in prod
+JWT_SECRET=change-this-in-production    # ← use a long random string in prod
 JWT_ALGORITHM=HS256
 JWT_EXPIRE_MINUTES=1440                 # 24 hours
 ```
 
 ---
 
-## Production Considerations
+## Production Checklist
 
 | Area | Current (MVP) | Production Path |
 |---|---|---|
-| Auth storage | localStorage (XSS risk) | httpOnly cookies |
-| JWT secret | Static env var | Secrets manager (AWS SSM, Vault) |
-| Password hashing | bcrypt (good) | Keep bcrypt, increase rounds |
+| Auth storage | `localStorage` (XSS risk) | `httpOnly` cookies |
+| JWT secret | Static env var | Secrets manager (AWS SSM / Vault) |
+| Password hashing | bcrypt ✅ | Keep — increase cost rounds |
 | ETA model | Linear formula | Train on historical logs with sklearn |
 | TSP solver | Nearest neighbor | Google OR-Tools CVRPTW |
-| MongoDB | Single node | Replica set with oplog |
+| MongoDB | Single Docker node | Replica set with oplog |
 | Frontend | Vite dev server | Static build behind CDN |
-| API | Uvicorn single process | Gunicorn + multiple Uvicorn workers |
+| API server | Single Uvicorn process | Gunicorn + multiple Uvicorn workers |
+| CORS | `localhost:5173` only | Lock to your production domain |
 
 ---
 
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Built with 🌿 to make delivery routing smarter and greener.
+
+</div>

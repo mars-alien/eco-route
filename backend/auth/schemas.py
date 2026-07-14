@@ -9,7 +9,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
-    role: str = "admin"
+    role: str = "driver"
 
 class TokenResponse(BaseModel):
     token: str

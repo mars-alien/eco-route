@@ -7,7 +7,38 @@ import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 import EmptyState from '../../components/ui/EmptyState'
 
-const FILTERS = ['ALL', 'PENDING', 'ASSIGNED', 'IN_TRANSIT', 'DELIVERED']
+const FILTERS = [
+  { id: 'ALL',        label: 'All' },
+  { id: 'PENDING',    label: 'Pending' },
+  { id: 'ASSIGNED',   label: 'Assigned' },
+  { id: 'IN_TRANSIT', label: 'In Transit' },
+  { id: 'DELIVERED',  label: 'Delivered' },
+]
+
+function FilterTab({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '7px 16px',
+        border: active ? '1.5px solid var(--accent)' : '1.5px solid transparent',
+        borderRadius: '50px',
+        background: active ? 'var(--accent-dim)' : 'transparent',
+        color: active ? '#92600A' : 'var(--text-secondary)',
+        fontSize: '13px',
+        fontWeight: active ? 700 : 500,
+        fontFamily: 'var(--font)',
+        cursor: 'pointer',
+        transition: 'all 150ms',
+        whiteSpace: 'nowrap',
+      }}
+      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = '#FFF8E8' }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent' }}
+    >
+      {children}
+    </button>
+  )
+}
 
 export default function OrdersPage() {
   const { data: orders, isLoading } = useOrders()
@@ -22,43 +53,41 @@ export default function OrdersPage() {
       <div className="page-header">
         <h1 className="page-title">Orders</h1>
         <Link to="/admin/orders/create">
-          <Button variant="primary">+ New Order</Button>
+          <Button variant="primary" style={{ fontSize: '14px' }}>＋ New Order</Button>
         </Link>
       </div>
 
-      <div className="card">
-        <div style={{ display: 'flex', gap: 'var(--s2)', marginBottom: 'var(--s4)', borderBottom: '1px solid var(--border)', paddingBottom: 'var(--s4)' }}>
+      <div className="card animate-in" style={{ padding: 0, overflow: 'hidden' }}>
+        {/* Filter bar */}
+        <div className="filter-tab-row" style={{
+          display: 'flex',
+          gap: 'var(--s2)',
+          padding: '16px 20px',
+          borderBottom: '1px solid var(--border)',
+          flexWrap: 'wrap',
+          background: 'var(--surface-raised)',
+        }}>
           {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                background: filter === f ? 'var(--accent-dim)' : 'transparent',
-                color: filter === f ? 'var(--accent)' : 'var(--text-secondary)',
-                border: filter === f ? '1px solid var(--accent)' : '1px solid transparent',
-                borderRadius: 'var(--r-sm)',
-                padding: '2px var(--s3)',
-                fontSize: 'var(--text-xs)',
-                fontWeight: 500,
-                cursor: 'pointer',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-              }}
-            >
-              {f.replace('_', ' ')}
-            </button>
+            <FilterTab key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>
+              {f.label}
+            </FilterTab>
           ))}
         </div>
 
-        {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--s10)' }}>
-            <Spinner />
-          </div>
-        ) : filtered.length === 0 ? (
-          <EmptyState message="No orders found." />
-        ) : (
-          <OrderTable orders={filtered} />
-        )}
+        {/* Content */}
+        <div style={{ padding: '4px 0' }}>
+          {isLoading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--s10)' }}>
+              <Spinner />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ padding: 'var(--s10)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
+              No {filter === 'ALL' ? '' : filter.toLowerCase().replace('_', ' ')} orders found.
+            </div>
+          ) : (
+            <div className="table-scroll-wrapper"><OrderTable orders={filtered} /></div>
+          )}
+        </div>
       </div>
     </ProtectedRoute>
   )

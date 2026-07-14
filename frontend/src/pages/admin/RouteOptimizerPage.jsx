@@ -7,7 +7,13 @@ import DeliveryMap from '../../components/map/DeliveryMap'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
 
-const CLUSTER_COLORS = ['var(--cluster-0)', 'var(--cluster-1)', 'var(--cluster-2)', 'var(--cluster-3)', 'var(--cluster-4)']
+const CLUSTER_COLORS = [
+  { css: 'var(--cluster-0)', hex: '#FF9F1C' },
+  { css: 'var(--cluster-1)', hex: '#2F9E6E' },
+  { css: 'var(--cluster-2)', hex: '#D6455D' },
+  { css: 'var(--cluster-3)', hex: '#7C8CE0' },
+  { css: 'var(--cluster-4)', hex: '#F2790B' },
+]
 
 function PlanCard({ plan, index, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen)
@@ -15,11 +21,13 @@ function PlanCard({ plan, index, defaultOpen }) {
 
   return (
     <div style={{
+      background: 'var(--surface)',
       border: '1px solid var(--border)',
-      borderLeft: `3px solid ${color}`,
+      borderLeft: `4px solid ${color.hex}`,
       borderRadius: 'var(--r-md)',
       marginBottom: 'var(--s3)',
       overflow: 'hidden',
+      boxShadow: '0 4px 12px rgba(180,130,20,0.06)',
     }}>
       <button
         onClick={() => setOpen((o) => !o)}
@@ -27,7 +35,7 @@ function PlanCard({ plan, index, defaultOpen }) {
           width: '100%',
           background: 'var(--surface-raised)',
           border: 'none',
-          padding: 'var(--s3) var(--s4)',
+          padding: '12px 14px',
           cursor: 'pointer',
           display: 'flex',
           justifyContent: 'space-between',
@@ -35,37 +43,46 @@ function PlanCard({ plan, index, defaultOpen }) {
           color: 'var(--text-primary)',
         }}
       >
-        <span style={{ fontWeight: 500, fontSize: 'var(--text-sm)' }}>{plan.driver_name}</span>
-        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{open ? '▲' : '▼'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{
+            width: '10px', height: '10px', borderRadius: '50%',
+            background: color.css, flexShrink: 0, display: 'block',
+          }} />
+          <span style={{ fontWeight: 700, fontSize: '14px', fontFamily: 'var(--font)' }}>{plan.driver_name}</span>
+        </div>
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{open ? '▲' : '▼'}</span>
       </button>
-      <div style={{ padding: '0 var(--s4) var(--s1)', background: 'var(--surface-raised)' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-          {plan.total_distance_km} km · {plan.total_eta_minutes} min · {plan.stops.length} stops
+
+      <div style={{ padding: '6px 14px 10px', background: 'var(--surface-raised)', borderBottom: open ? '1px solid var(--border)' : 'none' }}>
+        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          {plan.stops.length} stops · {plan.total_distance_km} km · ~{plan.total_eta_minutes} min
         </span>
       </div>
 
       {open && (
-        <div style={{ padding: 'var(--s3) var(--s4)', background: 'var(--surface)' }}>
+        <div style={{ padding: '12px 14px' }}>
           {plan.stops.map((stop) => (
             <div key={stop.order_id} style={{
               display: 'flex',
-              gap: 'var(--s3)',
+              gap: '10px',
               alignItems: 'flex-start',
-              paddingBottom: 'var(--s2)',
-              marginBottom: 'var(--s2)',
+              paddingBottom: '10px',
+              marginBottom: '10px',
               borderBottom: '1px solid var(--border-subtle)',
             }}>
               <div style={{
-                width: '20px', height: '20px', borderRadius: '50%',
-                background: color, display: 'flex', alignItems: 'center',
-                justifyContent: 'center', fontSize: '10px', fontWeight: 600,
+                width: '22px', height: '22px', borderRadius: '50%',
+                background: color.css,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '10px', fontWeight: 700,
                 flexShrink: 0, color: '#fff',
+                fontFamily: 'var(--font-heading)',
               }}>
                 {stop.sequence}
               </div>
               <div>
-                <div style={{ fontSize: 'var(--text-sm)', lineHeight: 1.3 }}>{stop.address}</div>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.4 }}>{stop.address}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                   ETA {stop.eta_minutes} min
                 </div>
               </div>
@@ -112,57 +129,76 @@ export default function RouteOptimizerPage() {
 
   return (
     <ProtectedRoute role="admin" title="Route Optimizer" mapLayout>
-      <div style={{ display: 'flex', height: '100%' }}>
-        <div style={{
-          width: '360px',
-          minWidth: '360px',
-          background: 'var(--surface)',
+      <div className="optimizer-layout" style={{ display: 'flex', height: '100%' }}>
+        {/* Left panel */}
+        <div className="optimizer-panel" style={{
+          width: '340px',
+          minWidth: '340px',
+          background: 'var(--sidebar-bg)',
           borderRight: '1px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
         }}>
-          <div style={{ padding: 'var(--s6)', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--s4)' }}>
-              K-Means++ / Nearest Neighbor Heuristic
+          {/* Controls */}
+          <div style={{ padding: 'var(--s5)', borderBottom: '1px solid var(--border)' }}>
+            <div style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: 'var(--text-muted)',
+              marginBottom: '16px',
+            }}>
+              K-Means++ / Nearest Neighbour Heuristic
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--s3)', marginBottom: 'var(--s4)' }}>
-              <div style={{ background: 'var(--surface-raised)', borderRadius: 'var(--r-md)', padding: 'var(--s3)' }}>
-                <div className="stat-label">Pending</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-lg)', fontWeight: 600 }}>
-                  {ordersLoading ? '…' : pending.length}
+            {/* Mini stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+              {[
+                { label: 'Pending', value: ordersLoading ? '…' : pending.length, grad: 'var(--grad-amber)' },
+                { label: 'Drivers', value: driversLoading ? '…' : drivers.length, grad: 'var(--grad-green)' },
+              ].map((s) => (
+                <div key={s.label} style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--r-md)',
+                  padding: '12px',
+                  boxShadow: '0 4px 10px rgba(180,130,20,0.07)',
+                }}>
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>{s.label}</div>
+                  <div style={{
+                    fontFamily: 'var(--font-heading)', fontSize: '28px', fontWeight: 700,
+                    backgroundImage: s.grad, WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                    lineHeight: 1,
+                  }}>{s.value}</div>
                 </div>
-              </div>
-              <div style={{ background: 'var(--surface-raised)', borderRadius: 'var(--r-md)', padding: 'var(--s3)' }}>
-                <div className="stat-label">Drivers</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-lg)', fontWeight: 600, color: 'var(--accent)' }}>
-                  {driversLoading ? '…' : drivers.length}
-                </div>
-              </div>
+              ))}
             </div>
 
             <Button
               variant="primary"
-              style={{ width: '100%', justifyContent: 'center' }}
+              style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '15px' }}
               disabled={optimize.isPending || pending.length === 0}
               onClick={handleOptimize}
             >
-              {optimize.isPending ? <><Spinner size={14} /> Optimizing…</> : 'Run Optimization'}
+              {optimize.isPending
+                ? <><Spinner size={14} /> Optimising…</>
+                : result ? 'Re-run Optimization' : 'Run Optimization'}
             </Button>
 
             {optimize.isError && (
-              <p style={{ color: '#e06060', fontSize: 'var(--text-xs)', marginTop: 'var(--s3)' }}>
-                {optimize.error?.response?.data?.message || 'Optimization failed'}
+              <p style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '10px', padding: '8px 10px', background: 'var(--danger-bg)', borderRadius: 'var(--r-sm)' }}>
+                {optimize.error?.response?.data?.message || 'Optimisation failed'}
               </p>
             )}
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--s4)' }}>
+          {/* Route plan list */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '14px' }}>
             {result && (
               <>
-                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 'var(--s3)', fontWeight: 500 }}>
-                  {result.total_orders_assigned} orders assigned · {result.clusters_generated} routes
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', fontWeight: 600 }}>
+                  {result.total_orders_assigned} orders assigned · {result.clusters_generated} routes generated
                 </div>
                 {result.route_plans.map((plan, i) => (
                   <PlanCard key={plan.plan_id} plan={plan} index={i} defaultOpen={i === 0} />
@@ -170,19 +206,19 @@ export default function RouteOptimizerPage() {
               </>
             )}
             {!result && !optimize.isPending && (
-              <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)', textAlign: 'center', marginTop: 'var(--s8)' }}>
-                Run optimization to see route plans
-              </p>
+              <div style={{ textAlign: 'center', padding: '40px 16px' }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🗺</div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: 1.6 }}>
+                  Run optimization to assign pending orders to drivers and generate route plans.
+                </p>
+              </div>
             )}
           </div>
         </div>
 
-        <div style={{ flex: 1 }}>
-          <DeliveryMap
-            orders={mapOrders}
-            clusters={clusters}
-            routes={routes}
-          />
+        {/* Map */}
+        <div className="optimizer-map" style={{ flex: 1 }}>
+          <DeliveryMap orders={mapOrders} clusters={clusters} routes={routes} />
         </div>
       </div>
     </ProtectedRoute>

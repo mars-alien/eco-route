@@ -1,7 +1,7 @@
 const CLASS_MAP = {
   PENDING: 'pending',
   ASSIGNED: 'assigned',
-  IN_TRANSIT: 'transit',
+  IN_TRANSIT: 'intransit',
   DELIVERED: 'delivered',
 }
 

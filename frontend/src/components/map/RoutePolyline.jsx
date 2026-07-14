@@ -1,7 +1,7 @@
 import { Polyline, Marker, Popup } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
-const CLUSTER_COLORS = ['#e07340', '#4272b8', '#7355a8', '#3b8c78', '#c49a1a']
+const CLUSTER_COLORS = ['var(--cluster-0)', 'var(--cluster-1)', 'var(--cluster-2)', 'var(--cluster-3)', 'var(--cluster-4)']
 
 function seqIcon(seq, color) {
   return divIcon({

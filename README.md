@@ -43,7 +43,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Two-column layout — warm gradient hero panel left, sign-in card right.*
 
 <!-- Replace with your screenshot -->
-![Login Page](screenshots/login.png)
+![Login Page](application-screenshots/login.png)
 
 ---
 
@@ -51,7 +51,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Four gradient stat tiles + recent orders list + available drivers with live status dots.*
 
 <!-- Replace with your screenshot -->
-![Admin Dashboard](screenshots/admin-dashboard.png)
+![Admin Dashboard](application-screenshots/admin.png)
 
 ---
 
@@ -59,7 +59,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Scrollable filter tabs, status pills, and inline delete for pending orders.*
 
 <!-- Replace with your screenshot -->
-![Orders Page](screenshots/orders.png)
+![Orders Page](application-screenshots/orders.png)
 
 ---
 
@@ -67,7 +67,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Split panel — controls + route cards left, live Leaflet map right. Color-coded clusters per driver.*
 
 <!-- Replace with your screenshot -->
-![Route Optimizer](screenshots/optimizer.png)
+![Route Optimizer](application-screenshots/optimizer.png)
 
 ---
 
@@ -75,7 +75,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Today's route summary + sequenced stop cards with Mark Delivered action.*
 
 <!-- Replace with your screenshot -->
-![Driver Dashboard](screenshots/driver-dashboard.png)
+![Driver Dashboard](application-screenshots/driver-dashboard.png)
 
 ---
 
@@ -83,7 +83,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 *Full-screen map with numbered pins, amber route polyline, and bottom-sheet current-stop panel.*
 
 <!-- Replace with your screenshot -->
-![Driver Route](screenshots/driver-route.png)
+![Driver Route](application-screenshots/driver-map.png)
 
 ---
 

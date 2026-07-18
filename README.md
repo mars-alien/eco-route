@@ -91,31 +91,31 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                        React Frontend                         │
+│                        React Frontend                        │
 │    React Query · Zustand · React Hook Form · Leaflet.js      │
 └──────────────────────────┬───────────────────────────────────┘
                            │  HTTP + JWT Bearer token
 ┌──────────────────────────▼───────────────────────────────────┐
-│                 FastAPI  (Modular Monolith)                   │
-│                                                               │
+│                 FastAPI  (Modular Monolith)                  │
+│                                                              │
 │   /auth      /orders     /drivers                            │
 │   /routing              /assignments                         │
-│                                                               │
+│                                                              │
 │   ┌───────────────────────────────────────────────────────┐  │
-│   │          Optimization Pipeline  (Pure Python)          │  │
-│   │                                                        │  │
-│   │   pending orders                                       │  │
-│   │        │                                               │  │
-│   │        ▼                                               │  │
+│   │          Optimization Pipeline  (Pure Python)         │  │
+│   │                                                       │  │
+│   │   pending orders                                      │  │
+│   │        │                                              │  │
+│   │        ▼                                              │  │
 │   │   geo.py ──► kmeans.py ──► tsp.py ──► eta.py          │  │
-│   │   Haversine    K-Means++   NN-TSP    Linear ETA        │  │
-│   │                                                        │  │
-│   │   Zero FastAPI / Motor imports — pure computation      │  │
+│   │   Haversine    K-Means++   NN-TSP    Linear ETA       │  │
+│   │                                                       │  │
+│   │   Zero FastAPI / Motor imports — pure computation     │  │
 │   └───────────────────────────────────────────────────────┘  │
 └──────────────────────────┬───────────────────────────────────┘
                            │  Motor (async driver)
 ┌──────────────────────────▼───────────────────────────────────┐
-│              MongoDB 7  (Atlas in prod · Docker locally)      │
+│              MongoDB 7  (Atlas in prod · Docker locally)     │
 │     orders · drivers · users · route_plans                   │
 │     2dsphere indexes on orders.location + drivers.location   │
 └──────────────────────────────────────────────────────────────┘

@@ -35,8 +35,6 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 
 ---
 
-## Screenshots
-
 
 ### 🔐 Login
 *Two-column layout — warm gradient hero panel left, sign-in card right.*

@@ -35,6 +35,9 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 
 ---
 
+## Screenshots
+
+> 📸 *Add your screenshots below by replacing the placeholder paths.*
 
 ### 🔐 Login
 *Two-column layout — warm gradient hero panel left, sign-in card right.*
@@ -112,7 +115,7 @@ No ML library wrappers. Every line of the optimization engine is explainable.
 └──────────────────────────┬───────────────────────────────────┘
                            │  Motor (async driver)
 ┌──────────────────────────▼───────────────────────────────────┐
-│                    MongoDB 7  (Docker)                        │
+│              MongoDB 7  (Atlas in prod · Docker locally)      │
 │     orders · drivers · users · route_plans                   │
 │     2dsphere indexes on orders.location + drivers.location   │
 └──────────────────────────────────────────────────────────────┘
@@ -213,6 +216,8 @@ ecoroute/
 │   ├── database.py              # Motor client, 2dsphere index creation
 │   ├── seed.py                  # Creates admin + 3 drivers + 15 Bengaluru orders
 │   ├── requirements.txt
+│   ├── render.yaml              # Render deployment blueprint
+│   ├── .python-version          # Pins Python 3.11 for Render
 │   ├── .env                     # Dev defaults — change JWT_SECRET before prod
 │   │
 │   ├── auth/                    # JWT login, register, /me, dependencies
@@ -234,6 +239,7 @@ ecoroute/
 └── frontend/
     ├── index.html
     ├── vite.config.js
+    ├── vercel.json              # SPA routing fix for Vercel
     ├── package.json
     └── src/
         ├── main.jsx             # QueryClient, BrowserRouter, root render
@@ -282,8 +288,8 @@ ecoroute/
 ### 1 · Clone
 
 ```bash
-git clone https://github.com/your-username/ecoroute.git
-cd ecoroute
+git clone https://github.com/mars-alien/eco-route.git
+cd eco-route
 ```
 
 ### 2 · Start MongoDB
@@ -548,17 +554,17 @@ JWT_EXPIRE_MINUTES=1440                 # 24 hours
 
 ## Production Checklist
 
-| Area | Current (MVP) | Production Path |
+| Area | Current | Production Path |
 |---|---|---|
 | Auth storage | `localStorage` (XSS risk) | `httpOnly` cookies |
-| JWT secret | Static env var | Secrets manager (AWS SSM / Vault) |
+| JWT secret | Render env var ✅ | Secrets manager (AWS SSM / Vault) |
 | Password hashing | bcrypt ✅ | Keep — increase cost rounds |
 | ETA model | Linear formula | Train on historical logs with sklearn |
 | TSP solver | Nearest neighbor | Google OR-Tools CVRPTW |
-| MongoDB | Single Docker node | Replica set with oplog |
-| Frontend | Vite dev server | Static build behind CDN |
-| API server | Single Uvicorn process | Gunicorn + multiple Uvicorn workers |
-| CORS | `localhost:5173` only | Lock to your production domain |
+| MongoDB | Atlas M0 free tier ✅ | Replica set with oplog |
+| Frontend | Vercel (CDN) ✅ | Custom domain + Vercel |
+| API server | Render (single Uvicorn) ✅ | Gunicorn + multiple Uvicorn workers |
+| CORS | Locked to Vercel domain ✅ | Update when domain changes |
 
 ---
 
